@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Dashboard CubeSat</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .error { color: red; }
+        .success { color: green; }
+        .section { margin: 20px 0; padding: 10px; border: 1px solid #ccc; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Diagnóstico Dashboard CubeSat</h1>
+    
+    <div class="section">
+        <h2>1. Verificación de Chart.js</h2>
+        <div id="chart-status">Verificando...</div>
+    </div>
+    
+    <div class="section">
+        <h2>2. Verificación de Three.js</h2>
+        <div id="three-status">Verificando...</div>
+    </div>
+    
+    <div class="section">
+        <h2>3. Verificación de Módulos</h2>
+        <div id="modules-status">Verificando...</div>
+    </div>
+    
+    <div class="section">
+        <h2>4. Test de Gráfico</h2>
+        <canvas id="testChart" width="400" height="200"></canvas>
+        <div id="chart-test-status">Iniciando test...</div>
+    </div>
+    
+    <div class="section">
+        <h2>5. Test de 3D</h2>
+        <div id="test3d" style="width: 400px; height: 200px; border: 1px solid #333;"></div>
+        <div id="three-test-status">Iniciando test...</div>
+    </div>
+
+    <!-- Cargar librerías locales -->
+    <script src="libs/chart/chart.min.js"></script>
+    <script src="libs/three/three.min.js"></script>
+    <script src="libs/three/OrbitControls.js"></script>
+
+    <script>
+        // Test 1: Chart.js
+        document.getElementById('chart-status').innerHTML = 
+            typeof Chart !== 'undefined' ? 
+            '<span class="success">✅ Chart.js cargado correctamente</span>' : 
+            '<span class="error">❌ Chart.js NO cargado</span>';
+
+        // Test 2: Three.js
+        document.getElementById('three-status').innerHTML = 
+            typeof THREE !== 'undefined' ? 
+            '<span class="success">✅ Three.js cargado correctamente</span>' : 
+            '<span class="error">❌ Three.js NO cargado</span>';
+
+        // Test 3: Verificar OrbitControls
+        const orbitStatus = (typeof THREE !== 'undefined' && THREE.OrbitControls) ? 
+            '<span class="success">✅ OrbitControls disponible</span>' : 
+            '<span class="error">❌ OrbitControls NO disponible</span>';
+
+        // Test 4: Cargar módulos
+        let moduleErrors = [];
+        
+        // Función para cargar script y verificar
+        function loadScript(src) {
+            return new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = src;
+                script.onload = resolve;
+                script.onerror = reject;
+                document.head.appendChild(script);
+            });
+        }
+
+        // Cargar módulos en secuencia
+        Promise.all([
+            loadScript('js/data-generator.js'),
+            loadScript('js/stats-module.js'),
+            loadScript('js/chart-module.js'),
+            loadScript('js/csv-module.js'),
+            loadScript('js/orientation3d-module.js')
+        ]).then(() => {
+            document.getElementById('modules-status').innerHTML = 
+                '<span class="success">✅ Todos los módulos cargados</span>';
+            
+            // Test de Chart.js
+            testChart();
+            
+            // Test de Three.js
+            test3D();
+            
+        }).catch((error) => {
+            document.getElementById('modules-status').innerHTML = 
+                '<span class="error">❌ Error cargando módulos: ' + error + '</span>';
+        });
+
+        function testChart() {
+            try {
+                if (typeof Chart === 'undefined') {
+                    throw new Error('Chart.js no está disponible');
+                }
+
+                const ctx = document.getElementById('testChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: ['1', '2', '3', '4', '5'],
+                        datasets: [{
+                            label: 'Test Data',
+                            data: [10, 20, 15, 25, 30],
+                            borderColor: 'rgb(75, 192, 192)',
+                            tension: 0.1
+                        }]
+                    },
+                    options: {
+                        responsive: false,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Test Chart'
+                            }
+                        }
+                    }
+                });
+                
+                document.getElementById('chart-test-status').innerHTML = 
+                    '<span class="success">✅ Gráfico de prueba creado exitosamente</span>';
+                    
+            } catch (error) {
+                document.getElementById('chart-test-status').innerHTML = 
+                    '<span class="error">❌ Error creando gráfico: ' + error.message + '</span>';
+            }
+        }
+
+        function test3D() {
+            try {
+                if (typeof THREE === 'undefined') {
+                    throw new Error('Three.js no está disponible');
+                }
+
+                const scene = new THREE.Scene();
+                const camera = new THREE.PerspectiveCamera(75, 2, 0.1, 1000);
+                const renderer = new THREE.WebGLRenderer();
+                
+                renderer.setSize(400, 200);
+                document.getElementById('test3d').appendChild(renderer.domElement);
+
+                // Crear un cubo simple
+                const geometry = new THREE.BoxGeometry(1, 1, 1);
+                const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+                const cube = new THREE.Mesh(geometry, material);
+                scene.add(cube);
+
+                camera.position.z = 5;
+
+                // Animar
+                function animate() {
+                    requestAnimationFrame(animate);
+                    cube.rotation.x += 0.01;
+                    cube.rotation.y += 0.01;
+                    renderer.render(scene, camera);
+                }
+                animate();
+
+                document.getElementById('three-test-status').innerHTML = 
+                    '<span class="success">✅ Escena 3D creada exitosamente</span>';
+                    
+            } catch (error) {
+                document.getElementById('three-test-status').innerHTML = 
+                    '<span class="error">❌ Error creando escena 3D: ' + error.message + '</span>';
+            }
+        }
+
+        // Mostrar información adicional
+        setTimeout(() => {
+            document.getElementById('modules-status').innerHTML += '<br>' + orbitStatus;
+            
+            // Mostrar errores de consola si los hay
+            window.addEventListener('error', function(e) {
+                console.error('Error detectado:', e.error);
+            });
+        }, 1000);
+    </script>
+</body>
+</html>

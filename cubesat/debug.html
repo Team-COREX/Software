@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { margin: 20px; font-family: Arial, sans-serif; background: #f0f0f0; }
+        .test-section { background: white; padding: 20px; margin: 10px 0; border-radius: 8px; }
+    </style>
+</head>
+<body>
+    <h1>Debug Test</h1>
+    
+    <div class="test-section">
+        <h2>1. Carga básica de módulos</h2>
+        <div id="moduleTest">Probando carga de módulos...</div>
+    </div>
+    
+    <div class="test-section">
+        <h2>2. Test de Chart.js</h2>
+        <canvas id="testChart" width="400" height="200"></canvas>
+    </div>
+    
+    <div class="test-section">
+        <h2>3. Console Log</h2>
+        <div id="consoleOutput">Revisa la consola del navegador (F12)</div>
+    </div>
+
+    <script>
+        console.log('=== INICIO DEBUG ===');
+        
+        // Test básico
+        try {
+            console.log('1. Test básico - OK');
+            document.getElementById('moduleTest').innerHTML = 'Test básico funcionando';
+            
+            // Test Chart.js
+            console.log('2. Probando Chart.js...');
+            const ctx = document.getElementById('testChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['A', 'B', 'C'],
+                    datasets: [{
+                        label: 'Test',
+                        data: [1, 2, 3],
+                        borderColor: 'red'
+                    }]
+                }
+            });
+            console.log('2. Chart.js - OK');
+            
+        } catch (error) {
+            console.error('Error en test básico:', error);
+            document.getElementById('moduleTest').innerHTML = 'ERROR: ' + error.message;
+        }
+    </script>
+    
+    <!-- Ahora probamos nuestros módulos -->
+    <script>
+        console.log('3. Cargando data-generator...');
+    </script>
+    <script src="js/data-generator.js"></script>
+    
+    <script>
+        try {
+            console.log('4. Probando DataGenerator...');
+            if (typeof DataGenerator !== 'undefined') {
+                DataGenerator.generateAllData();
+                console.log('4. DataGenerator - OK');
+                console.log('Total points:', DataGenerator.getTotalPoints());
+                document.getElementById('consoleOutput').innerHTML += '<br>DataGenerator cargado correctamente';
+            } else {
+                console.error('DataGenerator no está definido');
+                document.getElementById('consoleOutput').innerHTML += '<br>ERROR: DataGenerator no cargado';
+            }
+        } catch (error) {
+            console.error('Error con DataGenerator:', error);
+            document.getElementById('consoleOutput').innerHTML += '<br>ERROR DataGenerator: ' + error.message;
+        }
+    </script>
+</body>
+</html>

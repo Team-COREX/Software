@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Final - Dashboard CubeSat</title>
+    <script src="libs/chart/chart.min.js"></script>
+    <style>
+        .debug-info {
+            background: #f0f0f0;
+            padding: 10px;
+            margin: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .warning { background: #fff3cd; color: #856404; }
+        
+        .chart-container {
+            width: 400px;
+            height: 200px;
+            margin: 10px;
+            border: 1px solid #ccc;
+        }
+        
+        .cubesat3d-container {
+            width: 400px;
+            height: 300px;
+            margin: 10px;
+            border: 1px solid #ccc;
+            background: #000;
+        }
+        
+        button {
+            padding: 10px;
+            margin: 5px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Debug Final - Dashboard CubeSat</h1>
+    
+    <div id="debug-console" class="debug-info">
+        <h3>Console de Debug:</h3>
+        <div id="debug-messages"></div>
+    </div>
+    
+    <h3>1. Test Chart.js</h3>
+    <div class="chart-container">
+        <canvas id="testChart"></canvas>
+    </div>
+    
+    <h3>2. Test Three.js</h3>
+    <div id="cubesat3d" class="cubesat3d-container"></div>
+    <button id="playButton">▶ Reproducir</button>
+    <button id="pauseButton">⏸ Pausar</button>
+    <button id="resetButton">⏹ Reiniciar</button>
+    
+    <!-- Scripts -->
+    <script src="libs/three/three.min.js"></script>
+    <script src="libs/three/OrbitControls.js"></script>
+    <script>
+        // Función para mostrar debug messages en pantalla
+        function debugLog(message, type = 'info') {
+            const debugMessages = document.getElementById('debug-messages');
+            const div = document.createElement('div');
+            div.textContent = new Date().toLocaleTimeString() + ': ' + message;
+            div.className = type;
+            debugMessages.appendChild(div);
+            console.log(message);
+        }
+        
+        // Override console.log para mostrar en pantalla también
+        const originalLog = console.log;
+        const originalError = console.error;
+        
+        console.log = function(...args) {
+            debugLog(args.join(' '), 'success');
+            originalLog.apply(console, args);
+        };
+        
+        console.error = function(...args) {
+            debugLog(args.join(' '), 'error');
+            originalError.apply(console, args);
+        };
+        
+        // Test librerías
+        debugLog('=== INICIANDO TESTS ===');
+        
+        // 1. Test Chart.js
+        if (typeof Chart !== 'undefined') {
+            debugLog('✓ Chart.js cargado correctamente');
+            
+            try {
+                const ctx = document.getElementById('testChart').getContext('2d');
+                const chart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: ['1', '2', '3', '4', '5'],
+                        datasets: [{
+                            label: 'Test Data',
+                            data: [10, 20, 15, 25, 30],
+                            borderColor: 'red',
+                            backgroundColor: 'rgba(255, 0, 0, 0.1)'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Gráfico de Prueba'
+                            }
+                        }
+                    }
+                });
+                debugLog('✓ Gráfico Chart.js creado exitosamente');
+            } catch (error) {
+                debugLog('✗ Error creando gráfico Chart.js: ' + error.message, 'error');
+            }
+        } else {
+            debugLog('✗ Chart.js NO está disponible', 'error');
+        }
+        
+        // 2. Test Three.js
+        if (typeof THREE !== 'undefined') {
+            debugLog('✓ Three.js cargado correctamente');
+            
+            try {
+                // Crear escena simple
+                const scene = new THREE.Scene();
+                const camera = new THREE.PerspectiveCamera(75, 400/300, 0.1, 1000);
+                const renderer = new THREE.WebGLRenderer();
+                renderer.setSize(400, 300);
+                document.getElementById('cubesat3d').appendChild(renderer.domElement);
+                
+                // Crear cubo simple
+                const geometry = new THREE.BoxGeometry(1, 1, 1);
+                const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+                const cube = new THREE.Mesh(geometry, material);
+                scene.add(cube);
+                
+                camera.position.z = 5;
+                
+                // Test OrbitControls
+                if (typeof OrbitControls !== 'undefined') {
+                    debugLog('✓ OrbitControls disponible');
+                    const controls = new OrbitControls(camera, renderer.domElement);
+                } else {
+                    debugLog('✗ OrbitControls NO disponible', 'warning');
+                }
+                
+                // Función de animación
+                let isPlaying = false;
+                function animate() {
+                    requestAnimationFrame(animate);
+                    if (isPlaying) {
+                        cube.rotation.x += 0.01;
+                        cube.rotation.y += 0.01;
+                    }
+                    renderer.render(scene, camera);
+                }
+                animate();
+                
+                // Event listeners para botones
+                document.getElementById('playButton').addEventListener('click', () => {
+                    debugLog('Play button clicked');
+                    isPlaying = true;
+                });
+                
+                document.getElementById('pauseButton').addEventListener('click', () => {
+                    debugLog('Pause button clicked');
+                    isPlaying = false;
+                });
+                
+                document.getElementById('resetButton').addEventListener('click', () => {
+                    debugLog('Reset button clicked');
+                    isPlaying = false;
+                    cube.rotation.x = 0;
+                    cube.rotation.y = 0;
+                });
+                
+                debugLog('✓ Escena 3D creada exitosamente');
+                
+            } catch (error) {
+                debugLog('✗ Error creando escena 3D: ' + error.message, 'error');
+            }
+        } else {
+            debugLog('✗ Three.js NO está disponible', 'error');
+        }
+        
+        debugLog('=== TESTS COMPLETADOS ===');
+    </script>
+</body>
+</html>

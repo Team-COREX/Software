@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagnóstico Completo Dashboard</title>
+    <script src="libs/chart/chart.min.js"></script>
+    <script src="libs/three/three.min.js"></script>
+    <script src="libs/three/OrbitControls.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+        .warning { background-color: #fff3cd; color: #856404; }
+        .debug-section {
+            background: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        canvas {
+            border: 1px solid #ccc;
+            margin: 10px 0;
+        }
+        #cubesat3d {
+            width: 400px;
+            height: 300px;
+            border: 1px solid #ccc;
+            background: #000;
+        }
+        button {
+            padding: 10px 15px;
+            margin: 5px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .log {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <h1>Diagnóstico Completo - Dashboard CubeSat</h1>
+    
+    <div class="debug-section">
+        <h3>1. Estado de Librerías</h3>
+        <div id="library-status"></div>
+    </div>
+    
+    <div class="debug-section">
+        <h3>2. Módulos del Dashboard</h3>
+        <div id="modules-status"></div>
+    </div>
+    
+    <div class="debug-section">
+        <h3>3. Test de Gráfico Simple</h3>
+        <canvas id="testChart" width="400" height="200"></canvas>
+        <div id="chart-status"></div>
+    </div>
+    
+    <div class="debug-section">
+        <h3>4. Test de Three.js</h3>
+        <div id="cubesat3d"></div>
+        <button id="testPlayButton">▶ Test Reproducir</button>
+        <button id="testPauseButton">⏸ Test Pausar</button>
+        <div id="threejs-status"></div>
+    </div>
+    
+    <div class="debug-section">
+        <h3>5. Logs de Debug</h3>
+        <div id="debug-log" class="log"></div>
+    </div>
+
+    <!-- Primero cargar los módulos del dashboard -->
+    <script src="js/data-generator.js"></script>
+    <script src="js/stats-module.js"></script>
+    <script src="js/chart-module.js"></script>
+    <script src="js/csv-module.js"></script>
+    <script src="js/orientation3d-module.js"></script>
+
+    <script>
+        // Sistema de logging
+        const debugLog = document.getElementById('debug-log');
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = `[${timestamp}] ${type.toUpperCase()}: ${message}\n`;
+            debugLog.textContent += logEntry;
+            debugLog.scrollTop = debugLog.scrollHeight;
+            
+            if (type === 'error') {
+                console.error(message);
+            } else {
+                console.log(message);
+            }
+        }
+
+        function createStatus(element, message, type) {
+            const div = document.createElement('div');
+            div.className = `status ${type}`;
+            div.textContent = message;
+            element.appendChild(div);
+        }
+
+        // Diagnóstico completo
+        function runDiagnostic() {
+            log('=== INICIANDO DIAGNÓSTICO COMPLETO ===');
+            
+            // 1. Verificar librerías
+            const libraryStatus = document.getElementById('library-status');
+            
+            if (typeof Chart !== 'undefined') {
+                createStatus(libraryStatus, '✓ Chart.js disponible - Versión: ' + Chart.version, 'success');
+                log('Chart.js cargado correctamente');
+            } else {
+                createStatus(libraryStatus, '✗ Chart.js NO disponible', 'error');
+                log('Chart.js no está disponible', 'error');
+            }
+            
+            if (typeof THREE !== 'undefined') {
+                createStatus(libraryStatus, '✓ Three.js disponible - Versión: ' + THREE.REVISION, 'success');
+                log('Three.js cargado correctamente');
+            } else {
+                createStatus(libraryStatus, '✗ Three.js NO disponible', 'error');
+                log('Three.js no está disponible', 'error');
+            }
+            
+            if (typeof OrbitControls !== 'undefined') {
+                createStatus(libraryStatus, '✓ OrbitControls disponible', 'success');
+                log('OrbitControls cargado correctamente');
+            } else {
+                createStatus(libraryStatus, '✗ OrbitControls NO disponible', 'warning');
+                log('OrbitControls no está disponible', 'warning');
+            }
+            
+            // 2. Verificar módulos del dashboard
+            const modulesStatus = document.getElementById('modules-status');
+            
+            const modules = [
+                { name: 'DataGenerator', obj: window.DataGenerator },
+                { name: 'StatsModule', obj: window.StatsModule },
+                { name: 'ChartModule', obj: window.ChartModule },
+                { name: 'CSVModule', obj: window.CSVModule },
+                { name: 'Orientation3D', obj: window.Orientation3D }
+            ];
+            
+            modules.forEach(module => {
+                if (typeof module.obj !== 'undefined') {
+                    createStatus(modulesStatus, `✓ ${module.name} disponible`, 'success');
+                    log(`${module.name} cargado correctamente`);
+                } else {
+                    createStatus(modulesStatus, `✗ ${module.name} NO disponible`, 'error');
+                    log(`${module.name} no está disponible`, 'error');
+                }
+            });
+            
+            // 3. Test de gráfico
+            testChart();
+            
+            // 4. Test de Three.js
+            testThreeJS();
+            
+            // 5. Test de datos si DataGenerator está disponible
+            if (typeof DataGenerator !== 'undefined') {
+                testDataGeneration();
+            }
+            
+            log('=== DIAGNÓSTICO COMPLETADO ===');
+        }
+
+        function testChart() {
+            const chartStatus = document.getElementById('chart-status');
+            
+            if (typeof Chart === 'undefined') {
+                createStatus(chartStatus, '✗ No se puede probar gráfico - Chart.js no disponible', 'error');
+                return;
+            }
+            
+            try {
+                const ctx = document.getElementById('testChart').getContext('2d');
+                const chart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: ['1', '2', '3', '4', '5'],
+                        datasets: [{
+                            label: 'Test Data',
+                            data: [10, 20, 15, 25, 30],
+                            borderColor: 'blue',
+                            backgroundColor: 'rgba(0, 0, 255, 0.1)',
+                            tension: 0.1
+                        }]
+                    },
+                    options: {
+                        responsive: false,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Gráfico de Prueba'
+                            }
+                        }
+                    }
+                });
+                
+                createStatus(chartStatus, '✓ Gráfico de prueba creado exitosamente', 'success');
+                log('Gráfico de prueba creado exitosamente');
+                
+            } catch (error) {
+                createStatus(chartStatus, '✗ Error creando gráfico: ' + error.message, 'error');
+                log('Error creando gráfico: ' + error.message, 'error');
+            }
+        }
+
+        function testThreeJS() {
+            const threejsStatus = document.getElementById('threejs-status');
+            
+            if (typeof THREE === 'undefined') {
+                createStatus(threejsStatus, '✗ No se puede probar 3D - Three.js no disponible', 'error');
+                return;
+            }
+            
+            try {
+                // Crear escena simple
+                const scene = new THREE.Scene();
+                const camera = new THREE.PerspectiveCamera(75, 400/300, 0.1, 1000);
+                const renderer = new THREE.WebGLRenderer();
+                renderer.setSize(400, 300);
+                document.getElementById('cubesat3d').appendChild(renderer.domElement);
+                
+                // Crear cubo simple
+                const geometry = new THREE.BoxGeometry(1, 1, 1);
+                const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+                const cube = new THREE.Mesh(geometry, material);
+                scene.add(cube);
+                
+                camera.position.z = 5;
+                
+                // Test OrbitControls si está disponible
+                let controls;
+                if (typeof OrbitControls !== 'undefined') {
+                    controls = new OrbitControls(camera, renderer.domElement);
+                    log('OrbitControls inicializado correctamente');
+                }
+                
+                // Variables de animación
+                let isPlaying = false;
+                
+                // Función de animación
+                function animate() {
+                    requestAnimationFrame(animate);
+                    if (isPlaying) {
+                        cube.rotation.x += 0.01;
+                        cube.rotation.y += 0.01;
+                    }
+                    if (controls) controls.update();
+                    renderer.render(scene, camera);
+                }
+                animate();
+                
+                // Event listeners para botones de prueba
+                document.getElementById('testPlayButton').addEventListener('click', () => {
+                    isPlaying = true;
+                    log('Animación 3D iniciada');
+                });
+                
+                document.getElementById('testPauseButton').addEventListener('click', () => {
+                    isPlaying = false;
+                    log('Animación 3D pausada');
+                });
+                
+                createStatus(threejsStatus, '✓ Escena 3D creada exitosamente', 'success');
+                log('Escena 3D creada exitosamente');
+                
+            } catch (error) {
+                createStatus(threejsStatus, '✗ Error creando escena 3D: ' + error.message, 'error');
+                log('Error creando escena 3D: ' + error.message, 'error');
+            }
+        }
+
+        function testDataGeneration() {
+            try {
+                log('Probando generación de datos...');
+                DataGenerator.generateAllData();
+                log('✓ Datos generados correctamente');
+                
+                const totalPoints = DataGenerator.getTotalPoints();
+                log(`Total de puntos generados: ${totalPoints}`);
+                
+                const tempData = DataGenerator.getTemperatureData();
+                if (tempData && tempData.length > 0) {
+                    log(`✓ Datos de temperatura generados: ${tempData.length} puntos`);
+                    log(`Primer valor de temperatura: ${tempData[0]}`);
+                } else {
+                    log('✗ Error: No se generaron datos de temperatura', 'error');
+                }
+                
+            } catch (error) {
+                log('Error generando datos: ' + error.message, 'error');
+            }
+        }
+
+        // Ejecutar diagnóstico cuando la página cargue
+        document.addEventListener('DOMContentLoaded', function() {
+            log('DOM cargado, iniciando diagnóstico...');
+            setTimeout(runDiagnostic, 100); // Pequeño delay para asegurar que todo esté cargado
+        });
+    </script>
+</body>
+</html>

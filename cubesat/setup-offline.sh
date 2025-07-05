@@ -10,7 +10,7 @@ mkdir -p libs/chart
 mkdir -p libs/three
 
 echo "📦 Descargando Chart.js..."
-curl -o libs/chart/chart.min.js "https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.min.js"
+curl -o libs/chart/chart.min.js "https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"
 
 echo "📦 Descargando Three.js..."
 curl -o libs/three/three.min.js "https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"

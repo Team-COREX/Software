@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard de Telemetría CubeSat</title>
+    <title>Dashboard de CubeSat</title>
     <script src="libs/chart/chart.min.js"></script>
     <link rel="stylesheet" href="css/styles.css">
 </head>
@@ -14,7 +14,7 @@
     
     <!-- Navegación por pestañas -->
     <div class="tab-navigation">
-        <button class="tab-button active" onclick="showTab('telemetry')">Telemetría</button>
+        <button class="tab-button active" onclick="showTab('telemetry')">Datos</button>
         <button class="tab-button" onclick="showTab('orientation3d')">Vuelo 3D</button>
     </div>
 
@@ -25,7 +25,7 @@
     </div>
     
     <div class="stats-container">
-        <h3>Estadísticas de Telemetría</h3>
+        <h3>Estadísticas de CubeSat</h3>
         <div class="stats-grid" id="statistics">
             <!-- Las estadísticas se cargarán aquí -->
         </div>
@@ -104,7 +104,7 @@
             </div>
             
             <div class="telemetry-sidebar">
-                <h3>Telemetría en Tiempo Real</h3>
+                <h3>Datos en Tiempo Real</h3>
                 
                 <div class="telemetry-section">
                     <h4>Orientación</h4>

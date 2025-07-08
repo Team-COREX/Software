@@ -14,8 +14,8 @@
     
     <!-- Navegación por pestañas -->
     <div class="tab-navigation">
-        <button class="tab-button active" onclick="showTab('telemetry')">Datos</button>
-        <button class="tab-button" onclick="showTab('orientation3d')">Vuelo 3D</button>
+        <button class="tab-button active" onclick="showTab('telemetry', event)">Datos</button>
+        <button class="tab-button" onclick="showTab('orientation3d', event)">Vuelo 3D</button>
     </div>
 
     <!-- Contenido de la pestaña de Telemetría -->
@@ -97,8 +97,8 @@
                     </div>
                     <div class="control-group">
                         <label for="speedSlider">Velocidad:</label>
-                        <input type="range" id="speedSlider" min="1" max="10" value="5" class="slider">
-                        <span id="speedDisplay">5x</span>
+                        <input type="range" id="speedSlider" min="0.25" max="10" value="1" step="0.25" class="slider">
+                        <span id="speedDisplay">1x</span>
                     </div>
                 </div>
             </div>
@@ -204,7 +204,7 @@
     
     <script>
         // Función para cambiar entre pestañas
-        function showTab(tabName) {
+        function showTab(tabName, event) {
             // Ocultar todas las pestañas
             const tabContents = document.querySelectorAll('.tab-content');
             tabContents.forEach(tab => tab.classList.remove('active'));
@@ -216,16 +216,12 @@
             // Mostrar la pestaña seleccionada
             document.getElementById(tabName).classList.add('active');
             
-            // Activar el botón correspondiente
-            event.target.classList.add('active');
-            
-            // Si se selecciona la pestaña 3D, inicializar la visualización
-            if (tabName === 'orientation3d' && window.Orientation3D) {
-                setTimeout(() => {
-                    Orientation3D.init();
-                }, 100);
+            // Activar el botón correspondiente solo si event existe
+            if (event && event.target) {
+                event.target.classList.add('active');
             }
-        }
+            Orientation3D.init();
+        };
     </script>
 </body>
 </html>

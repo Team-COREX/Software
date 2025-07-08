@@ -1,10 +1,14 @@
-// Módulo para visualización 3D de la orientación del CubeSat
+document.getElementById('speedSlider').addEventListener('input', function() {
+    console.log('Valor del slider:', this.value, typeof this.value);
+    document.getElementById('speedDisplay').textContent = parseFloat(this.value) + 'x';
+});// Módulo para visualización 3D de la orientación del CubeSat
 const Orientation3D = (function() {
     let scene, camera, renderer, cubesat;
     let isInitialized = false;
     let animationId;
     let isPlaying = false;
     let currentTimeIndex = 0;
+    let currentTimeProgress = 0;
     let playbackSpeed = 5;
     let quaternionData = [];
     let gyroData = [];
@@ -208,6 +212,7 @@ const Orientation3D = (function() {
         const pauseButton = document.getElementById('pauseButton');
         const resetButton = document.getElementById('resetButton');
         const speedSlider = document.getElementById('speedSlider');
+        const speedDisplay = document.getElementById('speedDisplay');
         
         console.log('Elementos encontrados:', {
             timeSlider: !!timeSlider,
@@ -219,8 +224,9 @@ const Orientation3D = (function() {
         
         if (timeSlider) {
             timeSlider.max = quaternionData.length - 1;
+            timeSlider.step = 1;
             timeSlider.addEventListener('input', (e) => {
-                currentTimeIndex = parseInt(e.target.value);
+                currentTimeProgress = parseInt(e.target.value);
                 updateVisualization();
             });
         }
@@ -245,31 +251,55 @@ const Orientation3D = (function() {
         if (resetButton) {
             resetButton.addEventListener('click', () => {
                 isPlaying = false;
-                currentTimeIndex = 0;
+                currentTimeProgress = 0;
                 updateVisualization();
             });
         }
         
         if (speedSlider) {
-            speedSlider.addEventListener('input', (e) => {
-                playbackSpeed = parseInt(e.target.value);
-                document.getElementById('speedDisplay').textContent = playbackSpeed + 'x';
+            speedSlider.addEventListener('input', function() {
+                const speed = parseFloat(this.value); // Asegurarse de usar parseFloat en lugar de parseInt
+                speedDisplay.textContent = speed + 'x';
+                // Actualizar la velocidad de simulación
+                if (animationState.isPlaying) {
+                    // Aplicar la nueva velocidad
+                }
             });
         }
     }
     
+    function setupControls() {
+        const speedSlider = document.getElementById('speedSlider');
+        const speedDisplay = document.getElementById('speedDisplay');
+        
+        // Manejar cambios en el slider de velocidad
+        speedSlider.addEventListener('input', function() {
+            const speed = parseFloat(this.value); // Usar parseFloat para decimales
+            speedDisplay.textContent = speed.toFixed(2).replace(/\.?0+$/, '') + 'x'; // Formatear para mostrar decimales solo cuando sea necesario
+            
+            // Actualizar velocidad de simulación
+            if (window.animationState) {
+                window.animationState.speed = speed;
+            }
+        });
+        
+        // Inicializar el display con el valor actual
+        const initialSpeed = parseFloat(speedSlider.value);
+        speedDisplay.textContent = initialSpeed.toFixed(2).replace(/\.?0+$/, '') + 'x';
+    }
+    
     // Reproducir animación
     function playAnimation() {
-        console.log('playAnimation called, isPlaying:', isPlaying, 'currentTimeIndex:', currentTimeIndex);
+        console.log('playAnimation called, isPlaying:', isPlaying, 'currentTimeProgress:', currentTimeProgress);
         
         if (!isPlaying) {
             console.log('Animation stopped');
             return;
         }
         
-        currentTimeIndex += playbackSpeed;
-        if (currentTimeIndex >= quaternionData.length) {
-            currentTimeIndex = quaternionData.length - 1;
+        currentTimeProgress += playbackSpeed;
+        if (currentTimeProgress >= quaternionData.length) {
+            currentTimeProgress = quaternionData.length - 1;
             isPlaying = false;
             console.log('Animation reached end');
         }
@@ -283,16 +313,17 @@ const Orientation3D = (function() {
     
     // Actualizar visualización con datos actuales
     function updateVisualization() {
-        if (!cubesat || !quaternionData[currentTimeIndex]) return;
+        const idx = Math.floor(currentTimeProgress);
+        if (!cubesat || !quaternionData[idx]) return;
         
-        const data = quaternionData[currentTimeIndex];
+        const data = quaternionData[idx];
         
         // Aplicar rotación al CubeSat
         cubesat.setRotationFromQuaternion(data.quaternion);
         
         // Actualizar controles
         const timeSlider = document.getElementById('timeSlider');
-        if (timeSlider) timeSlider.value = currentTimeIndex;
+        if (timeSlider) timeSlider.value = idx;
         
         // Actualizar displays de información
         updateDisplays(data);
@@ -300,7 +331,7 @@ const Orientation3D = (function() {
     
     // Actualizar displays de información
     function updateDisplays(data) {
-        const currentIndex = currentTimeIndex;
+        const currentIndex = Math.floor(currentTimeProgress);
         
         // Display de tiempo
         const timeDisplay = document.getElementById('timeDisplay');

@@ -267,8 +267,10 @@ h2 {
 
 .cubesat-3d-viewport {
     width: 100%;
-    height: 70%;
-    border: 2px solid #3498db;
+    height: 400px;
+    min-height: 300px;
+    background: #0f0f23;
+    border: 1px solid #222;
     border-radius: 8px;
     background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 100%);
     position: relative;

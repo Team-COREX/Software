@@ -12,11 +12,14 @@ mkdir -p libs/three
 echo "📦 Descargando Chart.js..."
 curl -o libs/chart/chart.umd.js "https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"
 
-echo "📦 Descargando Three.js..."
-curl -o libs/three/three.min.js "https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"
+echo "📦 Descargando mapa de Chart.js..."
+curl -o libs/chart/chart.umd.js.map "https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js.map"
 
-echo "📦 Descargando OrbitControls.js..."
-curl -o libs/three/OrbitControls.js "https://raw.githubusercontent.com/mrdoob/three.js/r128/examples/js/controls/OrbitControls.js"
+echo "📦 Descargando Three.js (versión r158)..."
+curl -o libs/three/three.min.js "https://unpkg.com/three@0.158.0/build/three.min.js"
+
+echo "📦 Descargando OrbitControls.js (versión r158)..."
+curl -o libs/three/OrbitControls.js "https://unpkg.com/three@0.158.0/examples/jsm/controls/OrbitControls.js"
 
 echo "✅ ¡Configuración completada!"
 echo ""

@@ -10,7 +10,7 @@ mkdir -p libs/chart
 mkdir -p libs/three
 
 echo "📦 Descargando Chart.js..."
-curl -o libs/chart/chart.min.js "https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"
+curl -o libs/chart/chart.umd.js "https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"
 
 echo "📦 Descargando Three.js..."
 curl -o libs/three/three.min.js "https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"
@@ -26,7 +26,7 @@ echo "2. Abre tu navegador en: http://localhost:8080"
 echo "3. ¡Disfruta del dashboard sin necesidad de internet!"
 echo ""
 echo "📁 Archivos descargados:"
-echo "   - libs/chart/chart.min.js ($(du -h libs/chart/chart.min.js | cut -f1))"
+echo "   - libs/chart/chart.umd.js ($(du -h libs/chart/chart.umd.js | cut -f1))"
 echo "   - libs/three/three.min.js ($(du -h libs/three/three.min.js | cut -f1))" 
 echo "   - libs/three/OrbitControls.js ($(du -h libs/three/OrbitControls.js | cut -f1))"
 echo ""

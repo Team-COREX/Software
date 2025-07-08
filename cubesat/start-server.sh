@@ -4,7 +4,7 @@ echo "🚀 Iniciando servidor para Dashboard CubeSat..."
 echo "📍 Directorio: $(pwd)"
 
 # Verificar si las librerías están presentes
-if [ ! -f "libs/chart/chart.min.js" ] || [ ! -f "libs/three/three.min.js" ]; then
+if [ ! -f "libs/chart/chart.umd.js" ] || [ ! -f "libs/three/three.min.js" ]; then
     echo "⚠️  Librerías offline no encontradas."
     echo "🔧 Ejecutando configuración automática..."
     ./setup-offline.sh

@@ -32,7 +32,7 @@ echo ""
 echo "📦 Verificando librerías offline:"
 missing=0
 
-if ! check_file "libs/chart/chart.min.js"; then
+if ! check_file "libs/chart/chart.umd.js"; then
     missing=$((missing + 1))
 fi
 

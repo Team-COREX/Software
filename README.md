@@ -32,7 +32,7 @@ python3 generate_csv.py
 mkdir -p libs/chart libs/three
 
 # Descargar Chart.js
-curl -o libs/chart/chart.min.js "https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.min.js"
+curl -o libs/chart/chart.umd.js "https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.min.js"
 
 # Descargar Three.js
 curl -o libs/three/three.min.js "https://unpkg.com/three@0.158.0/build/three.min.js"

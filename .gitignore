@@ -1,0 +1,98 @@
+# Archivos del sistema operativo
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Archivos temporales
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Archivos de configuración del editor
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Archivos de Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Entornos virtuales de Python
+venv/
+ENV/
+env/
+.env
+
+# Archivos CSV generados
+cubesat/csv_data/
+*.csv
+
+# Archivos de librerías descargadas (se descargan automáticamente)
+cubesat/libs/
+
+# Archivos de respaldo
+*.bak
+*.backup
+*.old
+
+# Archivos de prueba
+test_*.html
+debug*.html
+*test.html
+
+# Archivos de deployment
+*.tar.gz
+*.zip
+deploy/
+
+# Archivos de documentación temporal
+docs/build/
+.jekyll-cache/
+
+# Archivos de configuración local
+config.local.json
+settings.local.json
+.env.local
+
+# Archivos de servidor
+server.pid
+*.pid
+
+# Archivos de caché
+.cache/
+.parcel-cache/

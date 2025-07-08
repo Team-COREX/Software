@@ -129,7 +129,7 @@ const ChartModule = (function() {
                 plugins: {
                     title: {
                         display: true,
-                        text: 'Telemetría del CubeSat - Todos los sensores (4 horas)',
+                        text: 'Datos recopilados',
                         font: {
                             size: 16
                         }

@@ -1,0 +1,388 @@
+body {
+    margin: 0;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+    background-color: #f0f2f5;
+}
+.main-container {
+    width: 100%;
+    height: 60vh;
+    margin-bottom: 30px;
+    background-color: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.stats-container {
+    width: 100%;
+    background-color: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 30px;
+}
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 15px;
+}
+.stat-box {
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    transition: transform 0.2s;
+}
+.stat-box:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    width: 100%;
+}
+.chart-container {
+    height: 250px;
+    background-color: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+}
+.chart-container:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+h2, h3 {
+    color: #2c3e50;
+    margin-top: 0;
+    margin-bottom: 20px;
+}
+h2 {
+    text-align: center;
+    border-bottom: 2px solid #ecf0f1;
+    padding-bottom: 10px;
+}
+.timestamp {
+    text-align: center;
+    color: #7f8c8d;
+    margin-bottom: 20px;
+    font-size: 0.9em;
+}
+
+/* Estilos para los botones de CSV */
+.csv-buttons-container {
+    display: flex; 
+    flex-wrap: wrap; 
+    gap: 15px; 
+    margin-top: 10px;
+}
+
+.csv-button {
+    background-color: #3498db; 
+    color: white; 
+    border: none; 
+    padding: 10px 15px; 
+    border-radius: 5px; 
+    cursor: pointer; 
+    transition: background-color 0.3s;
+}
+
+.csv-button:hover {
+    background-color: #2980b9;
+}
+
+.csv-button.acceleration {
+    background-color: #e74c3c;
+}
+
+.csv-button.acceleration:hover {
+    background-color: #c0392b;
+}
+
+.csv-button.pressure {
+    background-color: #f39c12;
+}
+
+.csv-button.pressure:hover {
+    background-color: #d35400;
+}
+
+.csv-button.gyroscope {
+    background-color: #9b59b6;
+}
+
+.csv-button.gyroscope:hover {
+    background-color: #8e44ad;
+}
+
+/* Estilos para navegación por pestañas */
+.tab-navigation {
+    display: flex;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #e0e0e0;
+}
+
+.tab-button {
+    background-color: transparent;
+    border: none;
+    padding: 12px 24px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+    color: #666;
+    border-bottom: 3px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.tab-button:hover {
+    color: #3498db;
+    background-color: #f8f9fa;
+}
+
+.tab-button.active {
+    color: #3498db;
+    border-bottom-color: #3498db;
+    font-weight: 600;
+}
+
+/* Estilos para contenido de pestañas */
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* Estilos para controles 3D */
+.controls-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    align-items: center;
+}
+
+.control-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.control-group label {
+    font-weight: 600;
+    min-width: 80px;
+}
+
+.slider {
+    flex: 1;
+    min-width: 100px;
+    height: 6px;
+    background: #ddd;
+    outline: none;
+    border-radius: 3px;
+    -webkit-appearance: none;
+}
+
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    background: #3498db;
+    cursor: pointer;
+    border-radius: 50%;
+}
+
+.slider::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    background: #3498db;
+    cursor: pointer;
+    border-radius: 50%;
+    border: none;
+}
+
+.control-button {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s;
+}
+
+.control-button:hover {
+    background-color: #2980b9;
+}
+
+.control-button:disabled {
+    background-color: #bdc3c7;
+    cursor: not-allowed;
+}
+
+/* Estilos para datos de orientación */
+.orientation-data {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+}
+
+.orientation-item {
+    background-color: #f8f9fa;
+    padding: 12px;
+    border-radius: 6px;
+    border-left: 4px solid #3498db;
+}
+
+.orientation-item strong {
+    display: block;
+    margin-bottom: 5px;
+    color: #2c3e50;
+}
+
+.orientation-item div {
+    font-family: 'Courier New', monospace;
+    color: #27ae60;
+    font-size: 14px;
+}
+
+/* Estilos para la visualización 3D del vuelo */
+.flight-3d-container {
+    display: flex;
+    gap: 20px;
+    height: 80vh;
+}
+
+.cubesat-3d-section {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+}
+
+.cubesat-3d-viewport {
+    width: 100%;
+    height: 400px;
+    min-height: 300px;
+    background: #0f0f23;
+    border: 1px solid #222;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+.flight-controls {
+    margin-top: 15px;
+    padding: 15px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.telemetry-sidebar {
+    flex: 1;
+    background-color: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.telemetry-sidebar h3 {
+    margin-top: 0;
+    color: #2c3e50;
+    border-bottom: 2px solid #3498db;
+    padding-bottom: 10px;
+}
+
+.telemetry-sidebar h4 {
+    color: #34495e;
+    margin: 15px 0 10px 0;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.telemetry-section {
+    margin-bottom: 20px;
+    padding: 10px;
+    background-color: #f8f9fa;
+    border-radius: 6px;
+    border-left: 4px solid #3498db;
+}
+
+.telemetry-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    padding: 5px 0;
+    border-bottom: 1px solid #ecf0f1;
+}
+
+.telemetry-item:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.telemetry-item .label {
+    font-weight: 600;
+    color: #2c3e50;
+    font-size: 13px;
+    min-width: 80px;
+}
+
+.telemetry-item .value {
+    font-family: 'Courier New', monospace;
+    color: #27ae60;
+    font-size: 12px;
+    text-align: right;
+    font-weight: 500;
+}
+
+.status-nominal {
+    color: #27ae60 !important;
+    font-weight: bold;
+}
+
+.status-warning {
+    color: #f39c12 !important;
+    font-weight: bold;
+}
+
+.status-critical {
+    color: #e74c3c !important;
+    font-weight: bold;
+}
+
+/* Responsive design para pantallas pequeñas */
+@media (max-width: 1024px) {
+    .flight-3d-container {
+        flex-direction: column;
+        height: auto;
+    }
+    
+    .cubesat-3d-section {
+        flex: none;
+    }
+    
+    .cubesat-3d-viewport {
+        height: 60vh;
+    }
+    
+    .telemetry-sidebar {
+        flex: none;
+        max-height: none;
+    }
+}

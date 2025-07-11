@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard de CubeSat</title>
+    <script src="libs/chart/chart.umd.js"></script>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="timestamp">Datos recopilados el 23 de junio de 2025 • Período de monitoreo: 4 horas</div>
+    
+    <h2>Simulación de Datos de CubeSat - Período de 4 Horas</h2>
+    
+    <!-- Navegación por pestañas -->
+    <div class="tab-navigation">
+        <button class="tab-button active" onclick="showTab('telemetry', event)">Datos</button>
+        <button class="tab-button" onclick="showTab('orientation3d', event)">Vuelo 3D</button>
+    </div>
+
+    <!-- Contenido de la pestaña de Telemetría -->
+    <div id="telemetry" class="tab-content active">
+    <div class="main-container">
+        <canvas id="multiDataChart"></canvas>
+    </div>
+    
+    <div class="stats-container">
+        <h3>Estadísticas de CubeSat</h3>
+        <div class="stats-grid" id="statistics">
+            <!-- Las estadísticas se cargarán aquí -->
+        </div>
+    </div>
+    
+    <!-- Sección para descarga de datos CSV -->
+    <div class="stats-container">
+        <h3>Descargar Datos en CSV</h3>
+        <div class="csv-buttons-container">
+            <button id="csvTempMuestra1" class="csv-button">Temperatura Muestra 1</button>
+            <button id="csvTempMuestra2" class="csv-button">Temperatura Muestra 2</button>
+            <button id="csvTempMuestra3" class="csv-button">Temperatura Muestra 3</button>
+            <button id="csvTempcubesat" class="csv-button">Temperatura cubesat</button>
+            <button id="csvAcceleration" class="csv-button acceleration">Aceleración</button>
+            <button id="csvPressure" class="csv-button pressure">Presión</button>
+            <button id="csvGyroscope" class="csv-button gyroscope">Giroscopio (X,Y,Z)</button>
+        </div>
+    </div>
+     <h3>Sensores del CubeSat</h3>
+    <div class="grid-container">
+        <div class="chart-container">
+            <canvas id="accelerationChart"></canvas>
+        </div>
+        <div class="chart-container">
+            <canvas id="pressureChart"></canvas>
+        </div>
+        <div class="chart-container">
+            <canvas id="voltageChart"></canvas>
+        </div>
+        <div class="chart-container">
+            <canvas id="gyroscopeChart"></canvas>
+        </div>
+        <div class="chart-container">
+            <canvas id="tempcubesatChart"></canvas>
+        </div>
+    </div>
+
+    <h3>Muestras de Temperatura</h3>
+    <div class="grid-container">
+        <div class="chart-container">
+            <canvas id="tempMuestra1Chart"></canvas>
+        </div>
+        <div class="chart-container">
+            <canvas id="tempMuestra2Chart"></canvas>
+        </div>
+        <div class="chart-container">
+            <canvas id="tempMuestra3Chart"></canvas>
+        </div>
+    </div>
+    </div>
+
+    <!-- Contenido de la pestaña de Vuelo 3D -->
+    <div id="orientation3d" class="tab-content">
+        <div class="flight-3d-container">
+            <div class="cubesat-3d-section">
+                <h3>Visualización del Vuelo en 3D</h3>
+                <div id="cubesat3d" class="cubesat-3d-viewport"></div>
+                
+                <div class="flight-controls">
+                    <div class="control-group">
+                        <label for="timeSlider">Tiempo:</label>
+                        <input type="range" id="timeSlider" min="0" max="100" value="0" class="slider">
+                        <span id="timeDisplay">00:00:00</span>
+                    </div>
+                    <div class="control-group">
+                        <button id="playButton" class="control-button">▶ Reproducir</button>
+                        <button id="pauseButton" class="control-button">⏸ Pausar</button>
+                        <button id="resetButton" class="control-button">⏹ Reiniciar</button>
+                    </div>
+                    <div class="control-group">
+                        <label for="speedSlider">Velocidad:</label>
+                        <input type="range" id="speedSlider" min="0.25" max="10" value="1" step="0.25" class="slider">
+                        <span id="speedDisplay">1x</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="telemetry-sidebar">
+                <h3>Datos en Tiempo Real</h3>
+                
+                <div class="telemetry-section">
+                    <h4>Orientación</h4>
+                    <div class="telemetry-item">
+                        <span class="label">Cuaternión:</span>
+                        <span id="quaternionDisplay" class="value">q: (0, 0, 0, 1)</span>
+                    </div>
+                    <div class="telemetry-item">
+                        <span class="label">Ángulos Euler:</span>
+                        <span id="eulerDisplay" class="value">Roll: 0°, Pitch: 0°, Yaw: 0°</span>
+                    </div>
+                    <div class="telemetry-item">
+                        <span class="label">Vel. Angular:</span>
+                        <span id="angularVelocityDisplay" class="value">ωx: 0°/s, ωy: 0°/s, ωz: 0°/s</span>
+                    </div>
+                </div>
+                
+                <div class="telemetry-section">
+                    <h4>Temperaturas</h4>
+                    <div class="telemetry-item">
+                        <span class="label">cubesat:</span>
+                        <span id="tempcubesatDisplay" class="value">--°C</span>
+                    </div>
+                    <div class="telemetry-item">
+                        <span class="label">Muestra 1:</span>
+                        <span id="tempMuestra1Display" class="value">--°C</span>
+                    </div>
+                    <div class="telemetry-item">
+                        <span class="label">Muestra 2:</span>
+                        <span id="tempMuestra2Display" class="value">--°C</span>
+                    </div>
+                    <div class="telemetry-item">
+                        <span class="label">Muestra 3:</span>
+                        <span id="tempMuestra3Display" class="value">--°C</span>
+                    </div>
+                </div>
+                
+                <div class="telemetry-section">
+                    <h4>Sensores Físicos</h4>
+                    <div class="telemetry-item">
+                        <span class="label">Aceleración:</span>
+                        <span id="accelerationDisplay" class="value">--G</span>
+                    </div>
+                    <div class="telemetry-item">
+                        <span class="label">Presión:</span>
+                        <span id="pressureDisplay" class="value">--kPa</span>
+                    </div>
+                </div>
+                
+                <div class="telemetry-section">
+                    <h4>Estado de la Misión</h4>
+                    <div class="telemetry-item">
+                        <span class="label">Tiempo transcurrido:</span>
+                        <span id="missionTimeDisplay" class="value">00:00:00</span>
+                    </div>
+                    <div class="telemetry-item">
+                        <span class="label">Estado:</span>
+                        <span id="missionStatusDisplay" class="value status-nominal">Nominal</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts para visualización 3D locales -->
+    <script src="libs/three/three.min.js"></script>
+    <script src="libs/three/OrbitControls.js"></script>
+
+    <!-- Cargar los módulos JavaScript -->
+    <script>
+        console.log('Iniciando carga de módulos...');
+    </script>
+    <script src="js/data-generator.js"></script>
+    <script>
+        console.log('DataGenerator cargado');
+    </script>
+    <script src="js/stats-module.js"></script>
+    <script>
+        console.log('StatsModule cargado');
+    </script>
+    <script src="js/chart-module.js"></script>
+    <script>
+        console.log('ChartModule cargado');
+    </script>
+    <script src="js/csv-module.js"></script>
+    <script>
+        console.log('CSVModule cargado');
+    </script>
+    <script src="js/orientation3d-module.js"></script>
+    <script>
+        console.log('Orientation3D cargado');
+    </script>
+    <script src="js/app.js"></script>
+    <script>
+        console.log('App iniciado');
+    </script>
+    
+    <script>
+        // Función para cambiar entre pestañas
+        function showTab(tabName, event) {
+            // Ocultar todas las pestañas
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(tab => tab.classList.remove('active'));
+            
+            // Remover clase active de todos los botones
+            const tabButtons = document.querySelectorAll('.tab-button');
+            tabButtons.forEach(button => button.classList.remove('active'));
+            
+            // Mostrar la pestaña seleccionada
+            document.getElementById(tabName).classList.add('active');
+            
+            // Activar el botón correspondiente solo si event existe
+            if (event && event.target) {
+                event.target.classList.add('active');
+            }
+            Orientation3D.init();
+        };
+    </script>
+</body>
+</html>

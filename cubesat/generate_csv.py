@@ -20,7 +20,10 @@ READINGS_PER_SECOND = 5  # 5 lecturas por segundo
 TOTAL_POINTS = HOURS * MINUTES_PER_HOUR * SECONDS_PER_MINUTE * READINGS_PER_SECOND
 
 # Directorio para guardar los archivos CSV
-CSV_DIR = "csv_data"
+# Asegurar que los CSV siempre se escriban dentro del directorio del proyecto (junto al script)
+# Esto evita que al ejecutar el script desde la raíz se creen archivos fuera de `cubesat/csv_data`.
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+CSV_DIR = os.path.join(BASE_DIR, "csv_data")
 
 def create_csv_directory():
     """Crear el directorio para archivos CSV si no existe."""
@@ -278,6 +281,48 @@ def main():
                   list(zip(time_data, cell_voltages[0], cell_voltages[1], cell_voltages[2], cell_voltages[3], cell_voltages[4])))
     # Corriente de celdas (igual a bus en serie)
     save_csv_file("celdas_corriente.csv", ["Tiempo", "Corriente Serie (A)"], list(zip(time_data, cell_currents)))
+
+    # ===================== RIELES DE POTENCIA (3 railes) ===================== #
+    # Railes típicos: 5V, 3.3V, 12V (ejemplo). Cada uno con ligeras variaciones y picos.
+    rail_nominal = [5.0, 3.3, 12.0]
+    rail_voltages = [[], [], []]
+    rail_currents = [[], [], []]
+    rail_powers = [[], [], []]
+    for i in range(TOTAL_POINTS):
+        tp = i / TOTAL_POINTS
+        activity = math.sin(tp * math.pi * 6)
+        for r in range(3):
+            base_v = rail_nominal[r]
+            variance = 0.02 if r < 2 else 0.03  # 2% para 5V y 3.3V, 3% para 12V
+            noise_v = base_v * variance * (random.random() - 0.5)
+            rail_v = base_v + noise_v
+            base_current = [0.6, 0.4, 0.2][r]
+            current_noise = base_current * 0.15 * (random.random() - 0.5)
+            spike = (random.random() > 0.9995) * base_current * 1.2
+            rail_i = max(0.05, base_current + current_noise + spike + 0.05 * activity)
+            rail_p = rail_v * rail_i
+            rail_voltages[r].append(rail_v)
+            rail_currents[r].append(rail_i)
+            rail_powers[r].append(rail_p)
+
+    save_csv_file(
+        "rails_voltajes.csv",
+        ["Tiempo", "Rail1_V", "Rail2_V", "Rail3_V"],
+        list(zip(time_data, rail_voltages[0], rail_voltages[1], rail_voltages[2]))
+    )
+    print("Rails voltajes generado")
+    save_csv_file(
+        "rails_corrientes.csv",
+        ["Tiempo", "Rail1_I", "Rail2_I", "Rail3_I"],
+        list(zip(time_data, rail_currents[0], rail_currents[1], rail_currents[2]))
+    )
+    print("Rails corrientes generado")
+    save_csv_file(
+        "rails_potencias.csv",
+        ["Tiempo", "Rail1_P", "Rail2_P", "Rail3_P"],
+        list(zip(time_data, rail_powers[0], rail_powers[1], rail_powers[2]))
+    )
+    print("Rails potencias generado")
     
     print("\n¡Todos los archivos CSV han sido generados exitosamente!")
     print(f"Los archivos se encuentran en el directorio: {CSV_DIR}/")

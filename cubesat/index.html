@@ -175,7 +175,7 @@
         <h3>Gestión de Energía - Dispositivo General</h3>
         <div class="stats-container">
             <div class="stats-grid" style="grid-template-columns: repeat(auto-fill,minmax(160px,1fr));">
-                <div class="stat-box"><strong>Voltaje</strong><div id="busVoltageValue" style="font-size:1.3em;margin-top:6px;">-- V</div></div>
+                <div class="stat-box"><strong>Voltaje Bateria</strong><div id="busVoltageValue" style="font-size:1.3em;margin-top:6px;">-- V</div></div>
                 <div class="stat-box"><strong>Corriente</strong><div id="busCurrentValue" style="font-size:1.3em;margin-top:6px;">-- A</div></div>
                 <div class="stat-box"><strong>Potencia</strong><div id="busPowerValue" style="font-size:1.3em;margin-top:6px;">-- W</div></div>
             </div>
@@ -189,6 +189,10 @@
         <div class="grid-container">
             <div class="chart-container" style="grid-column: span 2; min-height:340px;"><canvas id="cellVoltagesChart"></canvas></div>
             <div class="chart-container" style="grid-column: span 1; min-height:340px;"><canvas id="cellCurrentsChart"></canvas></div>
+        </div>
+        <h3>Railes de Potencia (Voltajes)</h3>
+        <div class="grid-container">
+            <div class="chart-container"><canvas id="railsVoltagesChart"></canvas></div>
         </div>
         <p style="font-size:0.85em;color:#666;">Nota: El voltaje de bus representa la salida regulada (5V). Los voltajes de celdas muestran niveles individuales (Li-ion 3.7V-4.2V) y la corriente de celdas es común en una configuración en serie (variaciones representan medición y balanceo).</p>
     </div>

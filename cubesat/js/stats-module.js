@@ -41,6 +41,8 @@ const StatsModule = (function() {
             case 'Aceleración': units = 'G'; break;
             case 'Presión': units = 'kPa'; break;
             case 'Voltaje': units = 'V'; break;
+            case 'Corriente': units = 'A'; break;
+            case 'Potencia': units = 'W'; break;
             case 'Giroscopio': units = '°/s'; break;
         }
         
@@ -114,6 +116,8 @@ const StatsModule = (function() {
             acceleration: calculateStatistics(DataGenerator.getAccelerationData(), "Aceleración"),
             pressure: calculateStatistics(DataGenerator.getPressureData(), "Presión"),
             voltage: calculateStatistics(DataGenerator.getVoltageData(), "Voltaje"),
+            current: calculateStatistics(DataGenerator.getCurrentData(), "Corriente"),
+            power: calculateStatistics(DataGenerator.getPowerData(), "Potencia"),
             gyroscope: calculateStatistics(DataGenerator.getGyroscopeData(), "Giroscopio")
         };
     }

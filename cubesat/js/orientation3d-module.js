@@ -378,6 +378,7 @@ const Orientation3D = (function() {
         const temp3Data = DataGenerator.getTemp3Data();
         const accelData = DataGenerator.getAccelerationData();
         const pressureData = DataGenerator.getPressureData();
+    const altitudeData = DataGenerator.getAltitudeData();
         
         // Actualizar temperaturas
         const tempcubesatDisplay = document.getElementById('tempcubesatDisplay');
@@ -410,6 +411,14 @@ const Orientation3D = (function() {
         const pressureDisplay = document.getElementById('pressureDisplay');
         if (pressureDisplay && pressureData[index] !== undefined) {
             pressureDisplay.textContent = `${pressureData[index].toFixed(2)}kPa`;
+        }
+
+        // Actualizar altitud
+        const altitudeDisplay = document.getElementById('altitudeDisplay');
+        if (altitudeDisplay && altitudeData[index] !== undefined) {
+            altitudeDisplay.textContent = `${altitudeData[index].toFixed(1)} km`;
+        } else if (altitudeDisplay) {
+            console.log('Altitud no disponible en índice', index, altitudeData.length);
         }
         
         // Actualizar estado de la misión

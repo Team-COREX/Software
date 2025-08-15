@@ -250,6 +250,75 @@ const ChartModule = (function() {
     function createVoltageChart() {
         createIndividualChart('voltageChart', 'Voltaje', DataGenerator.getVoltageData(), 'rgba(75, 192, 192, 1)', 'V');
     }
+
+    // Gráficos de pestaña Energía
+    function createBusVoltageChart() {
+        if (!document.getElementById('busVoltageChart')) return;
+        if (typeof DataGenerator !== 'undefined' && DataGenerator.getVoltageData) {
+            createIndividualChart('busVoltageChart', 'Voltaje Bus', DataGenerator.getVoltageData(), 'rgba(75,192,192,1)', 'V');
+        }
+    }
+
+    function createBusCurrentChart() {
+        if (!document.getElementById('busCurrentChart')) return;
+        if (typeof DataGenerator !== 'undefined' && DataGenerator.getCurrentData) {
+            createIndividualChart('busCurrentChart', 'Corriente Bus', DataGenerator.getCurrentData(), 'rgba(255,159,64,1)', 'A');
+        }
+    }
+
+    function createBusPowerChart() {
+        if (!document.getElementById('busPowerChart')) return;
+        if (typeof DataGenerator !== 'undefined' && DataGenerator.getPowerData) {
+            createIndividualChart('busPowerChart', 'Potencia Bus', DataGenerator.getPowerData(), 'rgba(153,102,255,1)', 'W');
+        }
+    }
+
+    function createCellVoltagesChart() {
+        if (!document.getElementById('cellVoltagesChart')) return;
+    if (!(typeof DataGenerator !== 'undefined' && DataGenerator.getCellVoltageData)) return; // usar EnergyModule para CSV
+    const ctx = document.getElementById('cellVoltagesChart').getContext('2d');
+        const totalPoints = DataGenerator.getTotalPoints();
+        const timeLabels = DataGenerator.getTimeLabels();
+        const sampleInterval = Math.ceil(totalPoints / 300);
+        const sampledLabels = [];
+        const cellVoltages = DataGenerator.getCellVoltageData();
+        const sampledCells = [[],[],[],[],[]];
+        for (let i = 0; i < totalPoints; i += sampleInterval) {
+            sampledLabels.push(timeLabels[i] || '');
+            for (let c=0;c<5;c++) sampledCells[c].push(cellVoltages[c][i]);
+        }
+        new Chart(ctx, {
+            type:'line',
+            data:{
+                labels: sampledLabels,
+                datasets: sampledCells.map((arr,idx)=>({
+                    label: 'Celda '+(idx+1),
+                    data: arr,
+                    borderColor: ['#e74c3c','#e67e22','#f1c40f','#27ae60','#2980b9'][idx],
+                    backgroundColor: 'rgba(0,0,0,0)',
+                    pointRadius:0,
+                    borderWidth:1.5
+                }))
+            },
+            options:{
+                responsive:true,
+                maintainAspectRatio:false,
+                plugins:{
+                    title:{display:true,text:'Voltajes por Celda (V)'}
+                },
+                scales:{
+                    y:{min:3.6,max:4.25}
+                }
+            }
+        });
+    }
+
+    function createCellCurrentsChart() {
+        if (!document.getElementById('cellCurrentsChart')) return;
+        if (typeof DataGenerator !== 'undefined' && DataGenerator.getCellCurrentData) {
+            createIndividualChart('cellCurrentsChart', 'Corriente Celdas', DataGenerator.getCellCurrentData(), 'rgba(231,76,60,1)', 'A');
+        }
+    }
     
     function createGyroscopeChart() {
         const totalPoints = DataGenerator.getTotalPoints();
@@ -397,16 +466,34 @@ const ChartModule = (function() {
             
             createTempMuestra3Chart();
             console.log('✓ TempMuestra3Chart creado');
-            
+            // Gráficos de energía se crean al abrir la pestaña 'Energía'
             console.log('Todos los gráficos creados exitosamente');
         } catch (error) {
             console.error('Error al crear gráficos:', error);
             console.error('Stack trace:', error.stack);
         }
     }
+
+    // Creación diferida de gráficos de energía
+    let energyChartsCreated = false;
+    function createEnergyChartsIfNeeded() {
+        if (energyChartsCreated) {
+            return;
+        }
+        console.log('Creando gráficos de energía (diferido)...');
+        createBusVoltageChart();
+        createBusCurrentChart();
+        createBusPowerChart();
+        createCellVoltagesChart();
+        createCellCurrentsChart();
+        energyChartsCreated = true;
+        // Forzar un resize para layout correcto
+        setTimeout(()=>window.dispatchEvent(new Event('resize')), 50);
+    }
     
     // API pública del módulo
     return {
-        createAllCharts: createAllCharts
+        createAllCharts: createAllCharts,
+        createEnergyChartsIfNeeded: createEnergyChartsIfNeeded
     };
 })();

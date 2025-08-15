@@ -153,6 +153,65 @@ def generate_gyroscope_data():
     
     return gyro_x_data, gyro_y_data, gyro_z_data
 
+# ===================== NUEVOS GENERADORES DE ENERGÍA ===================== #
+
+def generate_voltage_data():
+    """Generar datos de voltaje de bus simulando ciclos de descarga/recarga."""
+    max_voltage = 5.0
+    min_voltage = 3.7
+    current_voltage = max_voltage
+    charging = False
+    voltage_data = []
+    for i in range(TOTAL_POINTS):
+        time_progress = i / TOTAL_POINTS
+        noise = (random.random() - 0.5) * 0.02
+        if charging:
+            current_voltage += 0.0003
+            if current_voltage >= max_voltage:
+                current_voltage = max_voltage
+                charging = False
+        else:
+            current_voltage -= 0.0001
+            if current_voltage <= min_voltage:
+                charging = True
+        activity_drop = 0.1 if math.sin(time_progress * math.pi * 8) > 0.7 else 0
+        voltage_data.append(current_voltage + noise - activity_drop)
+    return voltage_data
+
+def generate_current_and_power_data(voltage_data):
+    """Generar corriente y potencia del bus con picos de actividad."""
+    current_data = []
+    power_data = []
+    for i in range(TOTAL_POINTS):
+        time_progress = i / TOTAL_POINTS
+        base = 0.8 + math.sin(time_progress * math.pi * 6) * 0.1
+        noise = (random.random() - 0.5) * 0.05
+        spike = (random.random() * 0.7) if random.random() > 0.999 else 0
+        current = max(0.3, base + noise + spike)
+        current_data.append(current)
+        v = voltage_data[i] if i < len(voltage_data) else 5.0
+        power_data.append(v * current)
+    return current_data, power_data
+
+def generate_cell_data(current_data):
+    """Generar voltajes por celda (5 en serie) y corriente común de celdas."""
+    cell_voltages = [[] for _ in range(5)]
+    cell_currents = []
+    for i in range(TOTAL_POINTS):
+        soc = 0.5 + math.sin((i / TOTAL_POINTS) * math.pi * 2) * 0.4  # 0-1
+        for c in range(5):
+            base_cell = 3.7 + soc * 0.5  # 3.7 a ~4.2
+            imbalance = (c - 2) * 0.01
+            noise = (random.random() - 0.5) * 0.01
+            v = max(3.6, min(4.25, base_cell + imbalance + noise))
+            cell_voltages[c].append(v)
+        # Corriente común (serie) + pequeño ruido de medición
+        if i < len(current_data):
+            cell_currents.append(current_data[i] + (random.random() - 0.5) * 0.02)
+        else:
+            cell_currents.append(0.8)
+    return cell_voltages, cell_currents
+
 def save_csv_file(filename, headers, data):
     """Guardar datos en un archivo CSV."""
     filepath = os.path.join(CSV_DIR, filename)
@@ -202,6 +261,23 @@ def main():
     gyro_x_data, gyro_y_data, gyro_z_data = generate_gyroscope_data()
     save_csv_file("giroscopio_xyz.csv", ["Tiempo", "Giro X (Roll)", "Giro Y (Pitch)", "Giro Z (Yaw)"], 
                   list(zip(time_data, gyro_x_data, gyro_y_data, gyro_z_data)))
+
+    # ===================== NUEVOS ARCHIVOS DE ENERGÍA ===================== #
+    voltage_data = generate_voltage_data()
+    current_data, power_data = generate_current_and_power_data(voltage_data)
+    cell_voltages, cell_currents = generate_cell_data(current_data)
+
+    # Voltaje bus
+    save_csv_file("voltaje_bus.csv", ["Tiempo", "Voltaje (V)"], list(zip(time_data, voltage_data)))
+    # Corriente bus
+    save_csv_file("corriente_bus.csv", ["Tiempo", "Corriente (A)"], list(zip(time_data, current_data)))
+    # Potencia bus
+    save_csv_file("potencia_bus.csv", ["Tiempo", "Potencia (W)"], list(zip(time_data, power_data)))
+    # Voltajes de celdas (una fila: Time, Celda1..Celda5)
+    save_csv_file("celdas_voltajes.csv", ["Tiempo", "Celda1 (V)", "Celda2 (V)", "Celda3 (V)", "Celda4 (V)", "Celda5 (V)"],
+                  list(zip(time_data, cell_voltages[0], cell_voltages[1], cell_voltages[2], cell_voltages[3], cell_voltages[4])))
+    # Corriente de celdas (igual a bus en serie)
+    save_csv_file("celdas_corriente.csv", ["Tiempo", "Corriente Serie (A)"], list(zip(time_data, cell_currents)))
     
     print("\n¡Todos los archivos CSV han sido generados exitosamente!")
     print(f"Los archivos se encuentran en el directorio: {CSV_DIR}/")

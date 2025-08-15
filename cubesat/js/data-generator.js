@@ -22,6 +22,10 @@ const DataGenerator = (function() {
     let accelZData = [];
     let pressureData = [];
     let voltageData = [];
+    let currentData = [];
+    let powerData = [];
+    let cellVoltageData = [[],[],[],[],[]];
+    let cellCurrentData = [];
     let gyroscopeData = [];
     let gyroXData = [];
     let gyroYData = [];
@@ -166,6 +170,44 @@ const DataGenerator = (function() {
             voltageData.push(currentVoltage + noise - activityDrop);
         }
     }
+
+    // Generar corriente de bus y potencia (dependiendo de actividad)
+    function generateCurrentAndPowerData() {
+        currentData = [];
+        powerData = [];
+        // Corriente media 0.8 A con picos hasta 1.5 A
+        for (let i = 0; i < totalPoints; i++) {
+            const timeProgress = i / totalPoints;
+            const base = 0.8 + Math.sin(timeProgress * Math.PI * 6) * 0.1; // ondulación de carga
+            const noise = (Math.random()-0.5)*0.05;
+            const spike = Math.random() > 0.999 ? (Math.random()*0.7) : 0; // picos de actividad
+            const current = Math.max(0.3, base + noise + spike);
+            currentData.push(current);
+            const voltage = voltageData[i] || 5.0;
+            powerData.push(voltage * current);
+        }
+    }
+
+    // Generar voltajes por celda (5 celdas en serie Li-ion 3.7-4.2V) y corriente común
+    function generateCellData() {
+        // Inicializar
+        cellVoltageData = [[],[],[],[],[]];
+        cellCurrentData = [];
+        // Simular leve desbalance y ciclos de carga/descarga tomando referencia de voltajeData escalado
+        for (let i = 0; i < totalPoints; i++) {
+            // Estado de carga relativo (0-1) derivado de forma suave
+            const soc = 0.5 + Math.sin((i/totalPoints)*Math.PI*2) * 0.4; // ciclo
+            for (let c = 0; c < 5; c++) {
+                const baseCell = 3.7 + soc * 0.5; // 3.7 a 4.2
+                const imbalance = (c-2)*0.01; // ligero desbalance fijo
+                const noise = (Math.random()-0.5)*0.01;
+                cellVoltageData[c].push(Math.min(4.25, Math.max(3.6, baseCell + imbalance + noise)));
+            }
+            // Corriente de celda igual a corriente de bus (serie) + ruido de medición
+            const cellCurrent = (currentData[i] || 0.8) + (Math.random()-0.5)*0.02;
+            cellCurrentData.push(cellCurrent);
+        }
+    }
     
     // Función para generar datos de giroscopio (rotación en grados/segundo)
     function generateGyroscopeData() {
@@ -225,6 +267,8 @@ const DataGenerator = (function() {
         generateAccelerationData();
         generatePressureData();
         generateVoltageData();
+    generateCurrentAndPowerData();
+    generateCellData();
         generateGyroscopeData();
     }
     
@@ -243,6 +287,10 @@ const DataGenerator = (function() {
         getAccelZData: function() { return accelZData; },
         getPressureData: function() { return pressureData; },
         getVoltageData: function() { return voltageData; },
+    getCurrentData: function() { return currentData; },
+    getPowerData: function() { return powerData; },
+    getCellVoltageData: function() { return cellVoltageData; },
+    getCellCurrentData: function() { return cellCurrentData; },
         getGyroscopeData: function() { return gyroscopeData; },
         getGyroXData: function() { return gyroXData; },
         getGyroYData: function() { return gyroYData; },
